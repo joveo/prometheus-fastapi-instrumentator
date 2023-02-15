@@ -26,7 +26,9 @@ the fast track to get started with a preconfigured instrumentator:
 ```python
 from prometheus_fastapi_instrumentator import Instrumentator
 
-Instrumentator().instrument(app).expose(app)
+@app.on_event("startup")
+async def startup():
+    Instrumentator().instrument(app).expose(app)
 ```
 
 With this, your FastAPI is instrumented and metrics are ready to be scraped. The
@@ -48,7 +50,7 @@ In addition, following behaviour is active:
 - Status codes are grouped into `2xx`, `3xx` and so on.
 - Requests without a matching template are grouped into the handler `none`.
 
-If one of these presets does not suit your needs you can multiple things:
+If one of these presets does not suit your needs you can do one of multiple things:
 
 - Pick one of the already existing closures from
   [`metrics`](https://trallnag.github.io/prometheus-fastapi-instrumentator/metrics.html)
@@ -212,7 +214,7 @@ def http_requested_languages_total() -> Callable[[Info], None]:
     def instrumentation(info: Info) -> None:
         langs = set()
         lang_str = info.request.headers["Accept-Language"]
-        for element in lang_str.split(",")
+        for element in lang_str.split(","):
             element = element.split(";")[0].strip().lower()
             langs.add(element)
         for language in langs:
